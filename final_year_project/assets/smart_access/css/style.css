@@ -1,0 +1,35 @@
+#mainpage{
+  background-color: #E8E8E8;
+}
+
+#title{
+  text-align: center;
+}
+
+.space{
+  padding-top: 200px;
+}
+
+.space-50{
+  padding-top:50px;
+}
+
+video, canvas {
+
+  position: absolute;
+}
+#count{
+  color: #d43f3a;
+}
+.vcenter {
+   min-height: 100%;
+   display: -webkit-flex;
+   -webkit-justify-content: center;
+   -webkit-flex-direction: column;
+   -webkit-align-items: stretch;
+   display: flex;
+   justify-content: center;
+   flex-direction: column;
+   min-height: 90vh;
+   align-items: stretch;
+ }

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    {% load staticfiles %}
+    <meta charset="utf-8">
+    <title>Smart Access | Teoh's Home</title>
+    <link rel="stylesheet" href="{% static "smart_access/css/bootstrap/bootstrap.min.css" %}">
+    <link rel="stylesheet" href="{% static "smart_access/css/style.css" %}">
+    <script src="{% static "smart_access/js/jquery-1.11.3.min.js" %}"></script>
+    <script src="{% static "smart_access/js/bootstrap/bootstrap.min.js" %}"></script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="vcenter">
+        <div class="row">
+          <div class="col-md-8 col-md-offset-2 well">
+            <h1>New User <small>Registration</small></h1>
+            <form id='new_user' action="/register/" method="POST" onsubmit="return validateForm()">{% csrf_token %}
+              <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" class="form-control" id="name" name='name' placeholder="Name">
+              </div>
+              <div class="form-group">
+                <label for="contact">Contact</label>
+                <input type="text" class="form-control" id="contact" name='contact' placeholder="Contact">
+              </div>
+              <div class="form-group">
+                <label for="address">Address</label>
+                <textarea class="form-control" id='address' name='address' rows="3"></textarea>
+              </div>
+              <div class="form-group">
+                <label for="role">Role</label>
+                <select type="text" class="form-control" id="role" name='roles' placeholder="Role">
+                  <option value="Normal">Normal</option>
+                  <option value="Admin">Admin</option>
+                  <option value="Caregiver">Caregiver</option>
+                </select>
+              </div>
+              <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        function validateForm() {
+          var flag = true;
+          if($('#name').val() == ""){
+            flag = false;
+          }
+          if($('#contact').val() == ""){
+            flag = false;
+          }
+          if($('#address').val() == ""){
+            flag = false;
+          }
+          if( flag == false){
+            alert("All field must be filled in.")
+          }
+          return flag;
+        }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    {% load staticfiles %}
+    <meta charset="utf-8">
+    <title>Smart Access | Teoh's Home</title>
+    <link rel="stylesheet" href="{% static "smart_access/css/bootstrap/bootstrap.min.css" %}">
+    <link rel="stylesheet" href="{% static "smart_access/css/style.css" %}">
+    <script src="{% static "smart_access/js/jquery-1.11.3.min.js" %}"></script>
+    <script src="{% static "smart_access/js/bootstrap/bootstrap.min.js" %}"></script>
+
+  </head>
+  <body id='mainpage'>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6 col-md-offset-3">
+          <h2 id="title">Teoh's Home <br><small>smart access system</small></h2>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <div class="space"></div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-2 col-md-offset-4">
+            <button type="button" id="redirect_btn" class="btn btn-success btn-lg btn-block">Access</button>
+        </div>
+        <div class="col-md-2">
+          <button type="button" id="emergency_btn" class="btn btn-danger btn-lg btn-block">Emergency</button>
+        </div>
+
+      </div>
+    </div>
+  </body>
+  <script type="text/javascript">
+  $("windows").ready(function(){
+    $('#redirect_btn').bind('click', function(){
+      window.location.assign('/validate');
+    })
+
+    $('#emergency_btn').bind('click', function(){
+      window.location.assign('/sendMail');
+    })
+  })
+
+  </script>
+</html>

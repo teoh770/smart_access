@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    {% load staticfiles %}
+    <!-- CSS file -->
+    <link rel="stylesheet" href="{% static "smart_access/css/bootstrap/bootstrap.min.css" %}">
+    <link rel="stylesheet" href="{% static "smart_access/css/style.css" %}">
+
+    <!-- JavaScript file -->
+    <script src="{% static "smart_access/js/jquery-1.11.3.min.js" %}"></script>
+    <script src="{% static "smart_access/js/bootstrap/bootstrap.min.js" %}"></script>
+    <title>Smart Access | Teoh's Home</title>
+  </head>
+  <body>
+    <div class="container">
+      <div class="vcenter">
+        <div class="row">
+          <div class="col-md-8 col-md-offset-2">
+            <h1 class="text-center">Emergency email successfuly sent.</h1>
+            <h3 class="text-center">Will redirect to mainpage in 2 seconds.</h3>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+      $("windows").ready(function(){
+        setTimeout(function(){ window.location.assign('/'); },3000);
+      })
+
+    </script>
+  </body>
+</html>

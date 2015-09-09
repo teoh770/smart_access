@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    {% load staticfiles %}
+    <meta charset="utf-8">
+    <title>Smart Access | Teoh's Home</title>
+    <link rel="stylesheet" href="{% static "smart_access/css/bootstrap/bootstrap.min.css" %}">
+    <link rel="stylesheet" href="{% static "smart_access/css/style.css" %}">
+    <script src="{% static "smart_access/js/jquery-1.11.3.min.js" %}"></script>
+    <script src="{% static "smart_access/js/bootstrap/bootstrap.min.js" %}"></script>
+
+  </head>
+  <body>
+    <div class="space-50"></div>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-10">
+          <h2>Admin Panel</h2>
+        </div>
+        <div class="col-md-2">
+          <a href="/logout" class="btn btn-danger">Logout</a>
+        </div>
+      </div>
+    </div>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="">
+            <ul id="myTabs" class="nav nav-tabs" role="tablist">
+             <li role="presentation" class="active"><a href="#log" id="access-log" role="tab" data-toggle="tab" aria-controls="log" aria-expanded="false">Access Log</a></li>
+             <li role="presentation" class=""><a href="#list" role="tab" id="user-list" data-toggle="tab" aria-controls="list" aria-expanded="false">User List</a></li>
+           </ul>
+           <div id="myTabContent" class="tab-content">
+             <div role="tabpanel" class="tab-pane fade active in" id="log" aria-labelledby="access-log">
+               <table class="table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Access Timestamp</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for log in logList %}
+                  <tr>
+                    <td>{{ log.user.name }}</td>
+                    <td>{{ log.timeStamp }}</td>
+                    <td>{{ log.status }}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+
+             </div>
+             <div role="tabpanel" class="tab-pane fade" id="list" aria-labelledby="user-list">
+               <div class="row">
+                 <div style="padding-top:10px;" class="col-md-offset-10 col-md-2">
+                   <a href="/register" class="btn btn-success">Add New User</a>
+                 </div>
+               </div>
+               <table class="table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Contact Number</th>
+                    <th>Role</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for user in userList %}
+                  <tr>
+                    <td>{{ user.name }}</td>
+                    <td>{{ user.contact }}</td>
+                    <td>{{ user.roles }}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+             </div>
+           </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+
+</html>

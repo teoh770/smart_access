@@ -1,0 +1,155 @@
+
+<!doctype html>
+<html>
+<head>
+  {% load staticfiles %}
+  <meta charset="utf-8">
+  <!-- CSS file -->
+  <link rel="stylesheet" href="{% static "smart_access/css/bootstrap/bootstrap.min.css" %}">
+  <link rel="stylesheet" href="{% static "smart_access/css/style.css" %}">
+
+  <!-- JavaScript file -->
+  <script src="{% static "smart_access/js/jquery-1.11.3.min.js" %}"></script>
+  <script src="{% static "smart_access/js/bootstrap/bootstrap.min.js" %}"></script>
+  <script src="{% static "smart_access/js/tracking-min.js" %}"></script>
+  <script src="{% static "smart_access/js/face-min.js" %}"></script>
+  <script src="{% static "smart_access/js/js.cookie.js" %}"></script>
+  <title>Smart Access | Teoh's Home</title>
+</head>
+<body>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-6 col-md-offset-3">
+        <video id="video" width="520" height="440" preload autoplay loop muted></video>
+        <canvas id="canvas" width="520" height="440"></canvas>
+        <form id='photo' action="." method="post">{% csrf_token %}</form>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-6 col-md-offset-3">
+        <div class="space"></div>
+        <div class="space"></div>
+        <div class="space-50"></div>
+        <h2 class="text-center" id="status"></h2>
+        <h3 id="name"></h3>
+        <h3 id="contact"></h3>
+        <h3 id="address"></h3>
+      </div>
+      <div class="row">
+        <div class="col-md-4 col-md-offset-4">
+          <button type="button" id="passkey_btn" class="btn btn-success btn-lg btn-block">Use Passkey</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    //this fucntion responsible to convert dataURL into image blob
+    function dataURItoBlob(dataURI) {
+        var byteString;
+        if (dataURI.split(',')[0].indexOf('base64') >= 0){
+            byteString = atob(dataURI.split(',')[1]);
+        }else{
+            byteString = unescape(dataURI.split(',')[1]);
+          }
+        var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+        var ia = new Uint8Array(byteString.length);
+        for (var i = 0; i < byteString.length; i++) {
+            ia[i] = byteString.charCodeAt(i);
+        }
+        return new Blob([ia], {type:mimeString});
+    }
+    window.onload = function() {
+      $('#passkey_btn').bind('click', function(){
+        window.location.assign('/passkey');
+      })
+
+      var csrftoken = Cookies.get('csrftoken');
+      function csrfSafeMethod(method) {
+        // these HTTP methods do not require CSRF protection
+        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+      }
+
+      //due to Django csrf protection
+      //required to add the token in the ajax header
+      $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            }
+        }
+      });
+      var video = document.getElementById('video');
+      var canvas = document.getElementById('canvas');
+      var context = canvas.getContext('2d');
+      var tracker = new tracking.ObjectTracker('face');
+      var img = document.getElementById('thumbnail_img');
+      var counter = 0;
+      var failureCount = 0;
+      tracker.setInitialScale(3);
+      tracker.setStepSize(3);
+      tracker.setEdgesDensity(0.15);
+      var trackerTask = tracking.track('#video', tracker, { camera: true });
+      trackerTask.on('track', function(event) {
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        event.data.forEach(function(rect) {
+          //here will draw out the frame for face detection
+          context.strokeStyle = '#a64ceb';
+          context.strokeRect(rect.x, rect.y, rect.width, rect.height);
+          context.font = '11px Helvetica';
+          context.fillStyle = "#fff";
+          context.fillText('x: ' + rect.x + 'px', rect.x + rect.width + 5, rect.y + 11);
+          context.fillText('y: ' + rect.y + 'px', rect.x + rect.width + 5, rect.y + 22);
+          counter = counter + 1;
+          if( failureCount == 4){
+            //if too manay failure will redirect user to home page
+            window.location.assign('/');
+          }else{
+            if( counter == 10){
+              //get the image from video frame
+              context.drawImage(video, 0, 0, canvas.width, canvas.height);
+              //stop the tracking proccess
+              trackerTask.stop();
+              var dataURL = canvas.toDataURL('image/gif');
+              //convert the dataURL to image blob
+              var blob = dataURItoBlob(dataURL);
+              var fd = new FormData('#photo');
+              //append the image file into the form
+              fd.append("file", blob);
+              $('#status').html("Processing...")
+              //using jQuery ajax to submit the form to server
+              $.ajax({
+                url: '/verify/',
+                type: 'POST',
+                data: fd,
+                cache: false,
+                processData: false,
+                contentType: false,
+                dataType: 'json',
+                success: function(data) {
+                  //if data.error is true, which means the user not found
+                  if(data.error == true){
+                    $('#status').html("User not found, please try again!");
+                    trackerTask.run();
+                    counter = 0;
+                    failureCount += 1;
+                  }else{
+                    $('#status').hide();
+                    $('#name').html('Name: '+ data[0].fields.name);
+                    $('#address').html('Address: ' + data[0].fields.address);
+                    $('#contact').html('Contact: ' + data[0].fields.contact);
+                    setTimeout(function(){ window.location.assign('/granted'); },1500);
+
+                  }
+                }
+              });
+            }
+          }
+
+        });
+      });
+    };
+  </script>
+</body>
+</html>

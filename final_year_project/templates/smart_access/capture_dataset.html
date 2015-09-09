@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    {% load staticfiles %}
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="{% static "smart_access/css/bootstrap/bootstrap.min.css" %}">
+    <link rel="stylesheet" href="{% static "smart_access/css/style.css" %}">
+    <script src="{% static "smart_access/js/jquery-1.11.3.min.js" %}"></script>
+    <script src="{% static "smart_access/js/bootstrap/bootstrap.min.js" %}"></script>
+
+
+    <script src="{% static "smart_access/js/tracking-min.js" %}"></script>
+    <script src="{% static "smart_access/js/face-min.js" %}"></script>
+    <script src="{% static "smart_access/js/js.cookie.js" %}"></script>
+    <title>Smart Access | Teoh's Home</title>
+  </head>
+  <body>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6 col-md-offset-3">
+          <video id="video" width="520" height="440" preload autoplay loop muted></video>
+          <canvas id="canvas" width="520" height="440"></canvas>
+          <form id='photo' action="." method="post">{% csrf_token %}</form>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-6 col-md-offset-3">
+          <div class="space"></div>
+          <div class="space"></div>
+          <div class="space-50"></div>
+          <h2 class="text-center" id="count"></h2>
+          <h4 class="text-center">Please hold your position <br>system will help you to capture 10 face images.</h3>
+        </div>
+      </div>
+
+    </div>
+    <script>
+      function dataURItoBlob(dataURI) {
+          var byteString;
+          if (dataURI.split(',')[0].indexOf('base64') >= 0){
+              byteString = atob(dataURI.split(',')[1]);
+          }else{
+              byteString = unescape(dataURI.split(',')[1]);
+            }
+          var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+          var ia = new Uint8Array(byteString.length);
+          for (var i = 0; i < byteString.length; i++) {
+              ia[i] = byteString.charCodeAt(i);
+          }
+          return new Blob([ia], {type:mimeString});
+      }
+      window.onload = function() {
+        var csrftoken = Cookies.get('csrftoken');
+        function csrfSafeMethod(method) {
+          // these HTTP methods do not require CSRF protection
+          return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+        }
+        $.ajaxSetup({
+          beforeSend: function(xhr, settings) {
+              if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                  xhr.setRequestHeader("X-CSRFToken", csrftoken);
+              }
+          }
+        });
+        var video = document.getElementById('video');
+        var canvas = document.getElementById('canvas');
+        var context = canvas.getContext('2d');
+        var tracker = new tracking.ObjectTracker('face');
+        var img = document.getElementById('thumbnail_img');
+        var counter = 0;
+        var innerCounter = 1;
+        tracker.setInitialScale(3);
+        tracker.setStepSize(3);
+        tracker.setEdgesDensity(0.15);
+        var trackerTask = tracking.track('#video', tracker, { camera: true });
+        trackerTask.on('track', function(event) {
+          context.clearRect(0, 0, canvas.width, canvas.height);
+          event.data.forEach(function(rect) {
+            context.strokeStyle = '#a64ceb';
+            context.strokeRect(rect.x, rect.y, rect.width, rect.height);
+            context.font = '11px Helvetica';
+            context.fillStyle = "#fff";
+            context.fillText('x: ' + rect.x + 'px', rect.x + rect.width + 5, rect.y + 11);
+            context.fillText('y: ' + rect.y + 'px', rect.x + rect.width + 5, rect.y + 22);
+            counter = counter + 1;
+            console.log(counter);
+            if( counter%10 == 0 ){
+              if(innerCounter <= 10 ){
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                var dataURL = canvas.toDataURL('image/gif');
+                var blob = dataURItoBlob(dataURL);
+                var fd = new FormData('#photo');
+                fd.append("file", blob);
+                fd.append('num', innerCounter);
+                innerCounter += 1;
+                $.ajax({
+                  url: '/fileUpload/',
+                  type: 'POST',
+                  data: fd,
+                  cache: false,
+                  processData: false,
+                  contentType: false,
+                  success: function(data) {
+                      $('#count').html(innerCounter-1)
+
+                  }
+                });
+              }else{
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                trackerTask.stop();
+                window.location.assign('/');
+              }
+            }
+          });
+        });
+      };
+    </script>
+  </body>
+
+</html>

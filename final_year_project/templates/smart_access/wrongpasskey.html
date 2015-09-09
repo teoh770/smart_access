@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    {% load staticfiles %}
+    <meta charset="utf-8">
+    <title>Smart Access | Teoh's Home</title>
+    <link rel="stylesheet" href="{% static "smart_access/css/bootstrap/bootstrap.min.css" %}">
+    <link rel="stylesheet" href="{% static "smart_access/css/style.css" %}">
+    <link rel="stylesheet" href="{% static "smart_access/css/style.css" %}">
+    <script src="{% static "smart_access/js/jquery-1.11.3.min.js" %}"></script>
+    <script src="{% static "smart_access/js/bootstrap/bootstrap.min.js" %}"></script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="space"></div>
+          <h1 class="text-center">Incorrect Passkey</h1><br>
+          <h2 class="text-center">Access Denied</h2>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+      $("windows").ready(function(){
+        setTimeout(function(){ window.location.assign('/'); },2000);
+      })
+
+    </script>
+  </body>
+</html>
